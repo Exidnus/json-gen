@@ -10,7 +10,7 @@ fn main() {
     let args: Vec<String> = env::args().collect();
     let params = Params::parse(&args);
 
-    if let Some(path_to_file) = params.schema_from_file {
+    if let Some(ref path_to_file) = params.schema_from_file {
         let schema = read_schema_from_file(&path_to_file);
         let generated = generate(schema, params.count);
         write_result(&params, &generated)
@@ -20,7 +20,7 @@ fn main() {
 }
 
 fn write_result(params: &Params, result: &Vec<Json>) {
-    match params.output_file {
+    match params.output_file.as_ref() {
         Some(path) => {
             println!("Printing content to specified file: {}", path);
             for json in result {
@@ -63,11 +63,11 @@ fn generate(schema: Json, count: u32) -> Vec<Json> {
 }
 
 fn generate_one(schema_property: &Json) -> Json {
-    if let Json::String(t) = schema_property["type"] {
-        match t {
-            String::from("integer") => generate_int(),
-            String::from("string") => generate_string(),
-            String::from("boolean") => generate_boolean(),
+    if let Json::String(t) = &schema_property["type"] {
+        match t.as_ref() {
+            "integer" => generate_int(),
+            "string" => generate_string(),
+            "boolean" => generate_boolean(),
             _ => panic!("unsupported type")
         }
     } else {
@@ -81,7 +81,7 @@ fn generate_int() -> Json {
 }
 
 fn generate_string() -> Json {
-    let string_value = rand::thread_rng()
+    let string_value: String = rand::thread_rng()
         .sample_iter(Alphanumeric)
         .take(10)
         .map(char::from)
