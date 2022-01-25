@@ -1,12 +1,7 @@
-use core::panicking::panic;
-use std::collections::{BTreeMap, HashMap};
-use std::ops::Index;
 use std::env;
 use std::fs;
-use std::io::repeat;
-use rand::{Rng, RngCore, SeedableRng};
+use rand::{Rng, SeedableRng};
 use serde_json::{json, Map, Value as Json};
-use proc_macro::tracked_path::path;
 use rand::distributions::{Alphanumeric, Standard};
 use rand::rngs::StdRng;
 
@@ -27,15 +22,16 @@ fn main() {
 fn write_result(params: &Params, result: &Vec<Json>) {
     match params.output_file {
         Some(path) => {
-            result
-                .iter()
-                .map(|j| j.to_string())
-                .r
-            fs::write();
+            println!("Printing content to specified file: {}", path);
+            for json in result {
+                let str = json.to_string();
+                let path_ref: &str = path.as_ref();
+                fs::write(path_ref, str);
+            }
         },
         None => {
             for json in result {
-                println!(json)
+                println!("{}", json)
             }
         }
     }
