@@ -44,18 +44,20 @@ fn read_schema_from_file(path_to_file: &str) -> Json {
 
 //expect here that schema is valid
 fn generate(schema: Json, count: u32) -> Vec<Json> {
-    let schema_map = schema["properties"]
-        .as_object()
-        .expect("properties should be object");
-
     let mut result: Vec<Json> = Vec::new();
     let mut index = 0;
     while index < count {
-        let json = generate_one_json(schema_map);
+        let json = generate_one_json(extract_properties_map(&schema));
         result.push(json);
         index += 1;
     }
     result
+}
+
+fn extract_properties_map(json: &Json) -> &Map<String, Value> {
+    json["properties"]
+        .as_object()
+        .expect("properties should be object")
 }
 
 fn generate_one_json(schema_map: &Map<String, Value>) -> Json {
@@ -67,6 +69,7 @@ fn generate_one_json(schema_map: &Map<String, Value>) -> Json {
                 "string" => generate_string(),
                 "number" => generate_double(),
                 "boolean" => generate_boolean(),
+                "object" => generate_one_json(extract_properties_map(&v)),
                 _ => panic!("unsupported type")
             }
         } else {
