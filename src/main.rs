@@ -70,7 +70,7 @@ fn generate_one_json(schema_map: &Map<String, Json>) -> Json {
                 "number" => generate_double(),
                 "boolean" => generate_boolean(),
                 "object" => generate_one_json(extract_properties_map(&v)),
-                _ => panic!("unsupported type")
+                unknown => panic!("unsupported type: {}", unknown)
             }
         } else {
             panic!("No type")
