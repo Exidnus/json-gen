@@ -67,6 +67,7 @@ fn generate_one(schema_property: &Json) -> Json {
         match t.as_ref() {
             "integer" => generate_int(),
             "string" => generate_string(),
+            "number" => generate_double(),
             "boolean" => generate_boolean(),
             _ => panic!("unsupported type")
         }
@@ -78,6 +79,14 @@ fn generate_one(schema_property: &Json) -> Json {
 fn generate_int() -> Json {
     let number: i32 = StdRng::from_entropy().sample(Standard);
     json!(number)
+}
+
+//TODO numbers are without fraction like 123213.0, 4545345.0 and so on
+fn generate_double() -> Json {
+    let number: f32 = StdRng::from_entropy().sample(Standard);
+    let m: i32 = StdRng::from_entropy().sample(Standard);
+    let result: f32 = number * m as f32;
+    json!(result)
 }
 
 fn generate_string() -> Json {
