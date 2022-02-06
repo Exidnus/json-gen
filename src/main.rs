@@ -1,7 +1,7 @@
 use std::env;
 use std::fs;
 use rand::{Rng, SeedableRng};
-use serde_json::{json, Map, Value as Json};
+use serde_json::{json, Map, Value as Json, Value};
 use rand::distributions::{Alphanumeric, Standard};
 use rand::rngs::StdRng;
 
@@ -51,29 +51,30 @@ fn generate(schema: Json, count: u32) -> Vec<Json> {
     let mut result: Vec<Json> = Vec::new();
     let mut index = 0;
     while index < count {
-        let mut fields: Map<String, Json> = Map::new();
-        for (k, v) in schema_map {
-            let value_json = generate_one(v);
-            fields.insert(k.to_string(), value_json);
-        }
-        result.push(Json::Object(fields));
+        let json = generate_one_json(schema_map);
+        result.push(json);
         index += 1;
     }
     result
 }
 
-fn generate_one(schema_property: &Json) -> Json {
-    if let Json::String(t) = &schema_property["type"] {
-        match t.as_ref() {
-            "integer" => generate_int(),
-            "string" => generate_string(),
-            "number" => generate_double(),
-            "boolean" => generate_boolean(),
-            _ => panic!("unsupported type")
-        }
-    } else {
-        panic!("No type")
+fn generate_one_json(schema_map: &Map<String, Value>) -> Json {
+    let mut fields: Map<String, Json> = Map::new();
+    for (k, v) in schema_map {
+        let value_json = if let Json::String(t) = &v["type"] {
+            match t.as_ref() {
+                "integer" => generate_int(),
+                "string" => generate_string(),
+                "number" => generate_double(),
+                "boolean" => generate_boolean(),
+                _ => panic!("unsupported type")
+            }
+        } else {
+            panic!("No type")
+        };
+        fields.insert(k.to_string(), value_json);
     }
+    Json::Object(fields)
 }
 
 fn generate_int() -> Json {
