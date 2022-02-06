@@ -1,7 +1,7 @@
 use std::env;
 use std::fs;
 use rand::{Rng, SeedableRng};
-use serde_json::{json, Map, Value as Json, Value};
+use serde_json::{json, Map, Value as Json};
 use rand::distributions::{Alphanumeric, Standard};
 use rand::rngs::StdRng;
 
@@ -54,13 +54,13 @@ fn generate(schema: Json, count: u32) -> Vec<Json> {
     result
 }
 
-fn extract_properties_map(json: &Json) -> &Map<String, Value> {
+fn extract_properties_map(json: &Json) -> &Map<String, Json> {
     json["properties"]
         .as_object()
         .expect("properties should be object")
 }
 
-fn generate_one_json(schema_map: &Map<String, Value>) -> Json {
+fn generate_one_json(schema_map: &Map<String, Json>) -> Json {
     let mut fields: Map<String, Json> = Map::new();
     for (k, v) in schema_map {
         let value_json = if let Json::String(t) = &v["type"] {
