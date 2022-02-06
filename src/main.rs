@@ -54,7 +54,7 @@ fn generate(schema: Json, count: u32) -> Vec<Json> {
         let mut fields: Map<String, Json> = Map::new();
         for (k, v) in schema_map {
             let value_json = generate_one(v);
-            fields[k] = value_json;
+            fields.insert(k.to_string(), value_json);
         }
         result.push(Json::Object(fields));
         index += 1;
